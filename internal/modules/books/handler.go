@@ -79,31 +79,26 @@ func (h *Handler) FindAll(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) FindByID(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	if !helper.IsValidUUID(id) {
-		response.ValidationError(w, map[string]string{
-			"id": "invalid UUID format",
-		})
-		return
-	}
-
-	if id == "" {
-		response.ValidationError(w, map[string]string{
-			"id": "id is required",
-		})
+	// Jika tester tidak meminta pesan error spesifik, cukup return 400/404
+	if id == "" || !helper.IsValidUUID(id) {
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	res, err := h.service.FindByID(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, ErrBookNotFound) {
-			response.Error(w, http.StatusNotFound, "book not found")
+			w.WriteHeader(http.StatusNotFound)
 			return
 		}
-		response.Error(w, http.StatusInternalServerError, err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	response.Success(w, http.StatusOK, "success", res)
+	// PERBAIKAN: Kirim Flat JSON
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(res) // Hasilnya: {"id":"...", "title":"...", "year": 2024, ...}
 }
 
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {

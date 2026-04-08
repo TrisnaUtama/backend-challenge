@@ -39,9 +39,9 @@ func (s *service) Create(ctx context.Context, req CreateBookRequest) (*BookRespo
 	}
 
 	return &BookResponse{
-        ID: res.ID, Title: res.Title, Author: res.Author, Year: res.Year, 
-        CreatedAt: res.CreatedAt, UpdatedAt: res.UpdatedAt,
-    }, nil
+		ID: res.ID, Title: res.Title, Author: res.Author, Year: res.Year,
+		CreatedAt: res.CreatedAt, UpdatedAt: res.UpdatedAt,
+	}, nil
 }
 
 func (s *service) FindAll(ctx context.Context, params FindAllParams) ([]BookResponse, int, error) {
@@ -76,7 +76,6 @@ func (s *service) FindByID(ctx context.Context, id string) (*BookResponse, error
 	if err != nil {
 		return nil, err
 	}
-
 	if b == nil {
 		return nil, ErrBookNotFound
 	}
@@ -85,6 +84,7 @@ func (s *service) FindByID(ctx context.Context, id string) (*BookResponse, error
 		ID:        b.ID,
 		Title:     b.Title,
 		Author:    b.Author,
+		Year:      b.Year, // Pastikan ini dipassing
 		CreatedAt: b.CreatedAt,
 		UpdatedAt: b.UpdatedAt,
 	}, nil

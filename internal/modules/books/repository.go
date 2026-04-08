@@ -99,15 +99,15 @@ func (r *repository) FindAll(ctx context.Context, params FindAllParams) ([]*enti
 
 func (r *repository) FindById(ctx context.Context, id string) (*entities.Books, error) {
 	query := `
-		SELECT id, title, author, created_at, updated_at
-		FROM books
-		WHERE id = $1 AND deleted_at IS NULL
-	`
-
+        SELECT id, title, author, year, created_at, updated_at
+        FROM books
+        WHERE id = $1 AND deleted_at IS NULL
+    `
 	b := new(entities.Books)
 
+	// Tambahkan &b.Year di sini
 	err := r.db.QueryRow(ctx, query, id).
-		Scan(&b.ID, &b.Title, &b.Author, &b.CreatedAt, &b.UpdatedAt)
+		Scan(&b.ID, &b.Title, &b.Author, &b.Year, &b.CreatedAt, &b.UpdatedAt)
 
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -115,7 +115,6 @@ func (r *repository) FindById(ctx context.Context, id string) (*entities.Books, 
 		}
 		return nil, err
 	}
-
 	return b, nil
 }
 
