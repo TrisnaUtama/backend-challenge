@@ -103,10 +103,10 @@ func (h *Handler) FindByID(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	if !helper.IsValidUUID(id) {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	// if !helper.IsValidUUID(id) {
+	// 	w.WriteHeader(http.StatusBadRequest)
+	// 	return
+	// }
 
 	var req UpdateBookRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -138,10 +138,10 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
-	if !helper.IsValidUUID(id) {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	// if !helper.IsValidUUID(id) {
+	// 	w.WriteHeader(http.StatusBadRequest)
+	// 	return
+	// }
 
 	err := h.service.Delete(r.Context(), id)
 	if err != nil {
