@@ -1,7 +1,7 @@
 package health
 
 type PingResponse struct {
-	Success bool `json:"message"`
+	Success bool `json:"success"`
 }
 
 type EchoRequest struct {
@@ -9,5 +9,5 @@ type EchoRequest struct {
 }
 
 type EchoResponse struct {
-	Success bool `json:"message"`
+	Success bool `json:"success"`
 }
