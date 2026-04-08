@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS books (
     id  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     title   TEXT NOT NULL,
     author  TEXT NOT NULL,
+    year        INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT NOW(),
     updated_at TIMESTAMP DEFAULT NOW(),
     deleted_at  TIMESTAMP

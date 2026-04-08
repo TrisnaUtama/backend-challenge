@@ -30,6 +30,7 @@ func (s *service) Create(ctx context.Context, req CreateBookRequest) (*BookRespo
 	book := &entities.Books{
 		Title:  req.Title,
 		Author: req.Author,
+		Year:   req.Year,
 	}
 
 	res, err := s.repo.Insert(ctx, book)
@@ -38,12 +39,9 @@ func (s *service) Create(ctx context.Context, req CreateBookRequest) (*BookRespo
 	}
 
 	return &BookResponse{
-		ID:        res.ID,
-		Title:     res.Title,
-		Author:    res.Author,
-		CreatedAt: res.CreatedAt,
-		UpdatedAt: res.UpdatedAt,
-	}, nil
+        ID: res.ID, Title: res.Title, Author: res.Author, Year: res.Year, 
+        CreatedAt: res.CreatedAt, UpdatedAt: res.UpdatedAt,
+    }, nil
 }
 
 func (s *service) FindAll(ctx context.Context, params FindAllParams) ([]BookResponse, int, error) {

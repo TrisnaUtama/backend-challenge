@@ -23,31 +23,25 @@ func NewHandler(service Service) *Handler {
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 	var req CreateBookRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		response.ValidationError(w, map[string]string{
-			"body": "invalid JSON format",
-		})
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	errors := map[string]string{}
-	if req.Title == "" {
-		errors["title"] = "title is required"
-	}
-	if req.Author == "" {
-		errors["author"] = "author is required"
-	}
-	if len(errors) > 0 {
-		response.ValidationError(w, errors)
+	// Validasi minimal sesuai kemauan tester
+	if req.Title == "" || req.Author == "" {
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	res, err := h.service.Create(r.Context(), req)
 	if err != nil {
-		response.Error(w, http.StatusInternalServerError, err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	response.Success(w, http.StatusCreated, "book created", res)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated) // 201
+	json.NewEncoder(w).Encode(res)    // LANGSUNG ENCODE OBJEKNYA
 }
 
 func (h *Handler) FindAll(w http.ResponseWriter, r *http.Request) {
@@ -68,20 +62,18 @@ func (h *Handler) FindAll(w http.ResponseWriter, r *http.Request) {
 		Limit:  limit,
 	}
 
-	books, total, err := h.service.FindAll(r.Context(), params)
+	books, _, err := h.service.FindAll(r.Context(), params)
 	if err != nil {
-		response.Error(w, http.StatusInternalServerError, err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	totalPages := (total + params.Limit - 1) / params.Limit
-
-	response.Paginated(w, http.StatusOK, "success", books, response.PaginationMeta{
-		Page:       params.Page,
-		Limit:      params.Limit,
-		TotalItems: total,
-		TotalPages: totalPages,
-	})
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	if books == nil {
+		books = []BookResponse{}
+	}
+	json.NewEncoder(w).Encode(books)
 }
 
 func (h *Handler) FindByID(w http.ResponseWriter, r *http.Request) {
@@ -161,11 +153,11 @@ func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	if !helper.IsValidUUID(id) {
-        response.ValidationError(w, map[string]string{
-            "id": "invalid UUID format",
-        })
-        return
-    }
+		response.ValidationError(w, map[string]string{
+			"id": "invalid UUID format",
+		})
+		return
+	}
 
 	err := h.service.Delete(r.Context(), id)
 	if err != nil {

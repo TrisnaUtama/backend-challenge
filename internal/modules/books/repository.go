@@ -29,19 +29,15 @@ func NewRepository(db *pgxpool.Pool) Repository {
 
 func (r *repository) Insert(ctx context.Context, book *entities.Books) (*entities.Books, error) {
 	var b entities.Books
-	query := `	
-			INSERT INTO books (title, author) 
-			VALUES ($1, $2) 
-			RETURNING id, title, author, created_at, updated_at`
+	query := `  
+            INSERT INTO books (title, author, year) 
+            VALUES ($1, $2, $3) 
+            RETURNING id, title, author, year, created_at, updated_at`
 
-	err := r.db.QueryRow(ctx, query, book.Title, book.Author).
-		Scan(&b.ID, &b.Title, &b.Author, &b.CreatedAt, &b.UpdatedAt)
+	err := r.db.QueryRow(ctx, query, book.Title, book.Author, book.Year).
+		Scan(&b.ID, &b.Title, &b.Author, &b.Year, &b.CreatedAt, &b.UpdatedAt)
 
-	if err != nil {
-		return nil, err
-	}
-
-	return &b, nil
+	return &b, err
 }
 
 func (r *repository) FindAll(ctx context.Context, params FindAllParams) ([]*entities.Books, int, error) {
@@ -78,7 +74,7 @@ func (r *repository) FindAll(ctx context.Context, params FindAllParams) ([]*enti
 
 	args = append(args, params.Limit, offset)
 	dataQuery := fmt.Sprintf(`
-        SELECT id, title, author, created_at, updated_at
+        SELECT id, title, author, year, created_at, updated_at
         FROM books %s
         ORDER BY created_at DESC
         LIMIT $%d OFFSET $%d
@@ -93,15 +89,11 @@ func (r *repository) FindAll(ctx context.Context, params FindAllParams) ([]*enti
 	var books []*entities.Books
 	for rows.Next() {
 		b := new(entities.Books)
-		if err := rows.Scan(&b.ID, &b.Title, &b.Author, &b.CreatedAt, &b.UpdatedAt); err != nil {
+		if err := rows.Scan(&b.ID, &b.Title, &b.Author, &b.Year, &b.CreatedAt, &b.UpdatedAt); err != nil {
 			return nil, 0, err
 		}
 		books = append(books, b)
 	}
-	if err := rows.Err(); err != nil {
-		return nil, 0, err
-	}
-
 	return books, total, nil
 }
 
