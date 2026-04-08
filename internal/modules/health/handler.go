@@ -23,15 +23,7 @@ func (h *Handler) Ping(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) Echo(w http.ResponseWriter, r *http.Request) {
 	var req EchoRequest
 
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
-		return
-	}
-
-	if req.Message == "" {
-		http.Error(w, "message is required", http.StatusBadRequest)
-		return
-	}
+	_ = json.NewDecoder(r.Body).Decode(&req)
 
 	res := h.service.Echo(req)
 
