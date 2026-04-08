@@ -14,12 +14,16 @@ func Init(r chi.Router, db *pgxpool.Pool, authService auth.Service) {
 	handler := NewHandler(service)
 
 	r.Route("/books", func(r chi.Router) {
-		r.Post("/", handler.Create)
-		r.Get("/", handler.FindAll)
+		// Taruh ID-based routes di sini
 		r.Get("/{id}", handler.FindByID)
 		r.Put("/{id}", handler.Update)
 		r.Delete("/{id}", handler.Delete)
 
+		// Collection routes
+		r.Post("/", handler.Create)
+		r.Get("/", handler.FindAll)
+
+		// Protected area
 		r.Group(func(r chi.Router) {
 			r.Use(middleware.AuthMiddleware(authService))
 			r.Get("/protected", handler.FindAll)
