@@ -91,23 +91,25 @@ func (s *service) FindByID(ctx context.Context, id string) (*BookResponse, error
 }
 
 func (s *service) Update(ctx context.Context, id string, req UpdateBookRequest) (*BookResponse, error) {
-	book := &entities.Books{
-		Title:  req.Title,
-		Author: req.Author,
-	}
+    book := &entities.Books{
+        Title:  req.Title,
+        Author: req.Author,
+        Year:   req.Year,
+    }
 
-	res, err := s.repo.Update(ctx, id, book)
-	if err != nil {
-		return nil, err
-	}
+    res, err := s.repo.Update(ctx, id, book)
+    if err != nil {
+        return nil, err
+    }
 
-	return &BookResponse{
-		ID:        res.ID,
-		Title:     res.Title,
-		Author:    res.Author,
-		CreatedAt: res.CreatedAt,
-		UpdatedAt: res.UpdatedAt,
-	}, nil
+    return &BookResponse{
+        ID:        res.ID,
+        Title:     res.Title,
+        Author:    res.Author,
+        Year:      res.Year, // Masukkan ke response
+        CreatedAt: res.CreatedAt,
+        UpdatedAt: res.UpdatedAt,
+    }, nil
 }
 
 func (s *service) Delete(ctx context.Context, id string) error {

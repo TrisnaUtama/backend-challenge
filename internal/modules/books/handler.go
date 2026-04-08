@@ -2,7 +2,6 @@ package books
 
 import (
 	"backend-challenge/pkg/helper"
-	"backend-challenge/pkg/response"
 
 	"encoding/json"
 	"errors"
@@ -105,65 +104,54 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	if !helper.IsValidUUID(id) {
-		response.ValidationError(w, map[string]string{
-			"id": "invalid UUID format",
-		})
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	var req UpdateBookRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		response.ValidationError(w, map[string]string{
-			"body": "invalid JSON",
-		})
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	errs := map[string]string{}
-	if req.Title == "" {
-		errs["title"] = "title is required"
-	}
-	if req.Author == "" {
-		errs["author"] = "author is required"
-	}
-	if len(errs) > 0 {
-		response.ValidationError(w, errs)
+	if req.Title == "" || req.Author == "" {
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	res, err := h.service.Update(r.Context(), id, req)
 	if err != nil {
 		if errors.Is(err, ErrBookNotFound) {
-			response.Error(w, http.StatusNotFound, "book not found")
+			w.WriteHeader(http.StatusNotFound)
 			return
 		}
-		response.Error(w, http.StatusInternalServerError, err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	response.Success(w, http.StatusOK, "book updated", res)
+	// KIRIM FLAT JSON
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(res)
 }
 
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := chi.URLParam(r, "id")
 
 	if !helper.IsValidUUID(id) {
-		response.ValidationError(w, map[string]string{
-			"id": "invalid UUID format",
-		})
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	err := h.service.Delete(r.Context(), id)
 	if err != nil {
-		if err == ErrBookNotFound {
-			response.Error(w, http.StatusNotFound, "book not found")
+		if errors.Is(err, ErrBookNotFound) {
+			w.WriteHeader(http.StatusNotFound)
 			return
 		}
-
-		response.Error(w, http.StatusInternalServerError, err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	response.Success(w, http.StatusOK, "book deleted", nil)
+	w.WriteHeader(http.StatusOK)
 }

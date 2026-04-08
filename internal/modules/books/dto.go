@@ -11,6 +11,7 @@ type CreateBookRequest struct {
 type UpdateBookRequest struct {
 	Title  string `json:"title"`
 	Author string `json:"author"`
+	Year   int    `json:"year"`
 }
 
 type BookResponse struct {

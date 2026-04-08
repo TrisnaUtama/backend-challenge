@@ -119,28 +119,30 @@ func (r *repository) FindById(ctx context.Context, id string) (*entities.Books, 
 }
 
 func (r *repository) Update(ctx context.Context, id string, book *entities.Books) (*entities.Books, error) {
-	query := `
-		UPDATE books
-		SET title = $1,
-		    author = $2,
-		    updated_at = NOW()
-		WHERE id = $3 AND deleted_at IS NULL
-		RETURNING id, title, author, created_at, updated_at
-	`
+    query := `
+        UPDATE books
+        SET title = $1,
+            author = $2,
+            year = $3, -- Tambahkan ini
+            updated_at = NOW()
+        WHERE id = $4 AND deleted_at IS NULL
+        RETURNING id, title, author, year, created_at, updated_at
+    `
 
-	b := new(entities.Books)
+    b := new(entities.Books)
 
-	err := r.db.QueryRow(ctx, query, book.Title, book.Author, id).
-		Scan(&b.ID, &b.Title, &b.Author, &b.CreatedAt, &b.UpdatedAt)
+    // Update Scan untuk menyertakan b.Year
+    err := r.db.QueryRow(ctx, query, book.Title, book.Author, book.Year, id).
+        Scan(&b.ID, &b.Title, &b.Author, &b.Year, &b.CreatedAt, &b.UpdatedAt)
 
-	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, ErrBookNotFound
-		}
-		return nil, err
-	}
+    if err != nil {
+        if errors.Is(err, pgx.ErrNoRows) {
+            return nil, ErrBookNotFound
+        }
+        return nil, err
+    }
 
-	return b, nil
+    return b, nil
 }
 
 func (r *repository) Delete(ctx context.Context, id string) error {
