@@ -1,0 +1,31 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Backend Challenge",
+    "version": "1.0.0",
+    "description": "API documentation for Backend Challenge Desent"
+  },
+  "servers": [
+
+  ],
+  "components": {
+    "securitySchemes": {
+        "BearerAuth": {
+            "type": "http",
+            "scheme": "bearer",
+            "bearerFormat": "JWT"
+        }
+    },
+    "schemas": {
+      "Response": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean" },
+          "message": { "type": "string" },
+          "data":    { "type": "object" },
+          "error":   { "type": "string" }
+        }
+      }
+    }
+  }
+}

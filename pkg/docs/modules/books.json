@@ -1,0 +1,177 @@
+{
+  "paths": {
+    "/books/protected": {
+      "get": {
+        "tags": ["Books"],
+        "summary": "Get all books (protected)",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          { "name": "title", "in": "query", "schema": { "type": "string" }, "description": "Filter by title" },
+          { "name": "author", "in": "query", "schema": { "type": "string" }, "description": "Filter by author" },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 }, "description": "Page number" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 }, "description": "Items per page" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of books (protected)",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedBookResponse" }
+              }
+            }
+          },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/books": {
+      "post": {
+        "tags": ["Books"],
+        "summary": "Create book",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateBookRequest" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Book created",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BookResponse" }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": ["Books"],
+        "summary": "Get all books",
+        "parameters": [
+          { "name": "title", "in": "query", "schema": { "type": "string" }, "description": "Filter by title" },
+          { "name": "author", "in": "query", "schema": { "type": "string" }, "description": "Filter by author" },
+          { "name": "page", "in": "query", "schema": { "type": "integer", "default": 1 }, "description": "Page number" },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "default": 10 }, "description": "Items per page" }
+        ],
+        "responses": {
+          "200": {
+            "description": "Paginated list of books",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PaginatedBookResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/books/{id}": {
+      "get": {
+        "tags": ["Books"],
+        "summary": "Get book by ID",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Book detail",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BookResponse" }
+              }
+            }
+          },
+          "404": { "description": "Not found" }
+        }
+      },
+      "put": {
+        "tags": ["Books"],
+        "summary": "Update book",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/UpdateBookRequest" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Updated" }
+        }
+      },
+      "delete": {
+        "tags": ["Books"],
+        "summary": "Delete book",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": { "description": "Deleted" },
+          "404": { "description": "Not found" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CreateBookRequest": {
+        "type": "object",
+        "required": ["title", "author"],
+        "properties": {
+          "title": { "type": "string" },
+          "author": { "type": "string" }
+        }
+      },
+      "UpdateBookRequest": {
+        "type": "object",
+        "required": ["title", "author"],
+        "properties": {
+          "title": { "type": "string" },
+          "author": { "type": "string" }
+        }
+      },
+      "BookResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "author": { "type": "string" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "page": { "type": "integer", "example": 1 },
+          "limit": { "type": "integer", "example": 10 },
+          "total_items": { "type": "integer", "example": 20 },
+          "total_pages": { "type": "integer", "example": 2 }
+        }
+      },
+      "PaginatedBookResponse": {
+        "type": "object",
+        "properties": {
+          "success": { "type": "boolean", "example": true },
+          "message": { "type": "string", "example": "success" },
+          "data": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/BookResponse" }
+              },
+              "meta": { "$ref": "#/components/schemas/PaginationMeta" }
+            }
+          }
+        }
+      }
+    }
+  }
+}
