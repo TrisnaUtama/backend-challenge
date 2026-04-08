@@ -1,0 +1,19 @@
+name: backend_challenge
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: backend_challenge_api
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:31001:31001"
+    env_file:
+      - .env
+    networks:
+      - backend_challenge
+
+networks:
+  backend_challenge:
+    driver: bridge
