@@ -21,12 +21,15 @@ func (h *Handler) Ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Echo(w http.ResponseWriter, r *http.Request) {
-	var req EchoRequest
+	var req interface{}
 
-	_ = json.NewDecoder(r.Body).Decode(&req)
+	err := json.NewDecoder(r.Body).Decode(&req)
 
-	res := h.service.Echo(req)
+	if err != nil || req == nil {
+		req = map[string]interface{}{}
+	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(res)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(req)
 }

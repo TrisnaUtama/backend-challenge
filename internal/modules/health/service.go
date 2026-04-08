@@ -2,7 +2,7 @@ package health
 
 type Service interface {
 	Ping() PingResponse
-	Echo(req EchoRequest) EchoResponse
+	Echo(req interface{}) interface{}
 }
 
 type service struct{}
@@ -17,8 +17,6 @@ func (s *service) Ping() PingResponse {
 	}
 }
 
-func (s *service) Echo(req EchoRequest) EchoResponse {
-	return EchoResponse{
-		Success: true,
-	}
+func (s *service) Echo(req interface{}) interface{} {
+	return req
 }
