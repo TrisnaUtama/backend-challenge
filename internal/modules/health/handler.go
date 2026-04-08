@@ -21,15 +21,15 @@ func (h *Handler) Ping(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Echo(w http.ResponseWriter, r *http.Request) {
-	var req interface{}
+	var body json.RawMessage
 
-	err := json.NewDecoder(r.Body).Decode(&req)
+	err := json.NewDecoder(r.Body).Decode(&body)
 
-	if err != nil || req == nil {
-		req = map[string]interface{}{}
+	if err != nil || len(body) == 0 {
+		body = json.RawMessage("{}")
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(req)
+	w.Write(body)
 }
