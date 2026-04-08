@@ -13,12 +13,12 @@ func NewService() Service {
 
 func (s *service) Ping() PingResponse {
 	return PingResponse{
-		Message: "pong",
+		Success: true,
 	}
 }
 
 func (s *service) Echo(req EchoRequest) EchoResponse {
 	return EchoResponse{
-		Message: req.Message,
+		Success: true,
 	}
 }

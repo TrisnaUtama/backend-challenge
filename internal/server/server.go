@@ -86,6 +86,10 @@ func (s *Server) setupRoutes(db *database.PostgresDB) {
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, html)
 	})
+	
+	s.router.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "/docs", http.StatusMovedPermanently)
+	})
 
 	s.router.Route("/", func(r chi.Router) {
 		health.Init(r)

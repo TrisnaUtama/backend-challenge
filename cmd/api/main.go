@@ -36,4 +36,5 @@ func main() {
 	if err = http.ListenAndServe(serverAddr, srv.Handler()); err != nil {
 		log.Fatalf("Server failed to start: %v", err)
 	}
+
 }
